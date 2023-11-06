@@ -5,9 +5,10 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 
+from random import randint
+
 from .models import Profile
 from .forms import UserRegisterForm, UserLoginForm, UserUpdateForm, ProfileUpdateForm
-
 
 
 def user_register(request):
@@ -98,3 +99,40 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'account/change_password.html',{'form':form})
+
+
+
+# def login_phone(request):
+#     if request.method == 'POST':
+#         form = PhoneForm(request.POST)
+#         if form.is_valid():
+#             global random_code, phone
+#             data = form.cleaned_data
+#             phone = f"0{data['phone']}"
+#             random_code = randint(100,1000)
+#             #sms service
+#             return redirect('phone_verify')
+
+#     else:
+#         form = PhoneForm()
+#     return render(request, 'account/login_phone.html', {'form':form})
+
+
+
+# def phone_verify(request):
+#     if request.method == 'POST':
+#         form = PhoneVerifyForm(request.POST)
+#         if form.is_valid():
+#             data = form.cleaned_data
+#             if random_code == data['code']:
+#                 profile = Profile.objects.get(phone=phone)
+#                 user = User.objects.get(profile__id = profile.id)
+#                 login(request,user)
+#                 messages.success(request,'Welcome!','primary')
+#                 return redirect('home')
+#             else:
+#                 messages.error(request,'wrong code!','danger')
+
+#     else:
+#         form = PhoneVerifyForm()
+#     return render(request, 'account/phone_verify.html', {'form':form})

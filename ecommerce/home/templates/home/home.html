@@ -3,5 +3,9 @@
 home
 {% endblock %}
 {% block body %} 
-<h1>home</h1>
+    <h1>home</h1>
+    {% comment %} {% for cat in category %}
+        <h1>{{ cat.name }}</h1>
+        <img src="{{ cat.image }}" style="width:300px; height:300px" alt="">
+    {% endfor %} {% endcomment %}
 {% endblock %}

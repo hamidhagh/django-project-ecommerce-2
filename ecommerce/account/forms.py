@@ -2,8 +2,16 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
 
+
+error = {
+    'required': 'این فیلد اجباری است!',
+    'invalid': 'ایمیل نامعتبر است'
+}
+
+
+
 class UserRegisterForm(forms.Form):
-    username = forms.CharField(max_length=255,widget=forms.TextInput(attrs={'placeholder':'username'}))
+    username = forms.CharField(max_length=255,error_messages=error,widget=forms.TextInput(attrs={'placeholder':'username'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder':'email'}))
     first_name = forms.CharField(max_length=255)
     last_name = forms.CharField(max_length=255)
@@ -52,3 +60,11 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['phone','address']
+
+
+# class PhoneForm(forms.Form):
+#     phone = forms.IntegerField()
+
+
+# class PhoneVerifyForm(forms.Form):
+#     code = forms.IntegerField()

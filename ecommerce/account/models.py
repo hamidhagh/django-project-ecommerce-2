@@ -7,7 +7,7 @@ from phone_field import PhoneField
 
 
 class Profile(models.Model):
-    phone = PhoneField(null=True,blank=True)
+    phone = models.IntegerField(null=True,blank=True)
     address = models.CharField(max_length=255,null=True,blank=True)
     user = models.OneToOneField(User,on_delete=models.CASCADE)
 
