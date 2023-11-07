@@ -4,8 +4,12 @@ home
 {% endblock %}
 {% block body %} 
     <h1>home</h1>
-    {% comment %} {% for cat in category %}
-        <h1>{{ cat.name }}</h1>
-        <img src="{{ cat.image }}" style="width:300px; height:300px" alt="">
-    {% endfor %} {% endcomment %}
+    {% for cat in category %}
+        <a href="{{ cat.get_absolute_url }}">
+            <h1>{{ cat.name }}</h1>
+        </a>
+        <a href="{% url 'category' cat.id %}">
+            <img src="{{ cat.image.url }}" style="width:300px; height:300px" alt="">
+        </a>
+    {% endfor %}
 {% endblock %}

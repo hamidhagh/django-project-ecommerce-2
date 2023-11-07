@@ -1,12 +1,52 @@
 from django.db import models
+from django.urls import reverse
+
+class Category(models.Model):
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,blank=True,related_name='sub')
+    sub_category = models.BooleanField(default=False)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(allow_unicode=True,unique=True)
+    image = models.ImageField(upload_to='category',null=True,blank=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    modified_time = models.DateTimeField(auto_now=True)
 
 
-# class Category(models.Model):
-#     name = models.CharField(max_length=255)
-#     created_time = models.DateTimeField(auto_now_add=True)
-#     modified_time = models.DateTimeField(auto_now=True)
-#     image = models.ImageField(upload_to='category')
+    def __str__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return reverse('category', args=[self.slug, self.id])
+    
 
 
-#     def __str__(self):
-#         return self.name
+
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(allow_unicode=True,unique=True)
+    Category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+    price = models.PositiveIntegerField()
+    discount = models.PositiveIntegerField(null=True,blank=True)
+    sale_price = models.PositiveIntegerField()
+    description = models.TextField(null=True,blank=True)
+    image = models.ImageField(upload_to='product')
+    available = models.BooleanField(default=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    modified_time = models.DateTimeField(auto_now=True)
+
+
+    def __str__(self):
+        return self.name
+    
+    @property
+    def sale_price(self):
+        if not self.discount:
+            return self.price
+        elif self.discount:
+            total = (self.discount * self.price) / 100
+            return int(self.price - total)
+        return self.sale_price
+    
+
+    def get_absolute_url(self):
+        return reverse('product_info', args=[self.slug])
