@@ -3,33 +3,52 @@
 product
 {% endblock %}
 {% block body %} 
-    <h1>{{ product.name }}</h1>
-    <img src="{{ product.image.url }}" style="width:300px; height:300px" alt="">
-    <p>{{ product.description | safe }}</p>
-    <hr>
-    {% if product.status == 'size' %}
-        <form action="" method="post">
-            {% csrf_token %}
-            {% for data in product_line %}
-                <input type="radio" value="{{ data.id }}" {% if chosen_product_line.id == data.id %} checked {% endif %}
-                    name="select" onchange="this.form.submit();">
-                <a href="" style="text-decoration: none">{{ data.size }}</a>
-            {% endfor %}
-        </form>
-    {% elif product.status == 'color' %}
-        <form action="" method="post">
-            {% csrf_token %}
-            {% for data in product_line %}
-                <input type="radio" value="{{ data.id }}" {% if chosen_product_line.id == data.id %} checked {% endif %}
-                    name="select" onchange="this.form.submit();">
-                <a href="" style="text-decoration: none">{{ data.color }}</a>
-            {% endfor %}
-        </form>
-    {% endif %}
-    <hr>
-    {% for tag in similar %}
-        <a href="{% url 'product_info tag.id' %}"
-        <img src="{{ tag.image.url }}" style="width:300px; height:300px" alt="">
-    {% endfor %}
+    <div class="container">
+        <h1>{{ product.name }}</h1>
+        <img src="{{ product.image.url }}" style="width:300px; height:300px" alt="">
+        <p>{{ product.description | safe }}</p>
+        <h5>like: {{ product.total_like }}</h5>
+        {% if request.user.is_authenticated %}
 
+            {% if is_like %}
+                <a href="{% url 'product-like' product.id %}" class="btn btn-primary {% if is_dislike %} disabled {% endif %}">disLike</a>
+            {% else %}
+                <a href="{% url 'product-like' product.id %}" class="btn btn-primary {% if is_dislike %} disabled {% endif %}">Like</a>
+            {% endif %}
+
+            <h5>dislike: {{ product.total_dislike }}</h5>
+            {% if is_dislike %}
+                <a href="{% url 'product-dislike' product.id %}" class="btn btn-primary {% if is_like %} disabled {% endif %}">disLike</a>
+            {% else %}
+                <a href="{% url 'product-dislike' product.id %}" class="btn btn-primary {% if is_like %} disabled {% endif %}">Like</a>
+            {% endif %}
+
+        {% endif %}
+        <br>
+        <hr>
+        {% if product.status == 'size' %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for data in product_line %}
+                    <input type="radio" value="{{ data.id }}" {% if chosen_product_line.id == data.id %} checked {% endif %}
+                        name="select" onchange="this.form.submit();">
+                    <a href="" style="text-decoration: none">{{ data.size }}</a>
+                {% endfor %}
+            </form>
+        {% elif product.status == 'color' %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for data in product_line %}
+                    <input type="radio" value="{{ data.id }}" {% if chosen_product_line.id == data.id %} checked {% endif %}
+                        name="select" onchange="this.form.submit();">
+                    <a href="" style="text-decoration: none">{{ data.color }}</a>
+                {% endfor %}
+            </form>
+        {% endif %}
+        <hr>
+        {% for tag in similar %}
+            <a href="{% url 'product_info tag.id' %}"
+            <img src="{{ tag.image.url }}" style="width:300px; height:300px" alt="">
+        {% endfor %}
+    </div>
 {% endblock %}

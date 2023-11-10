@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 
@@ -42,6 +43,10 @@ class Product(models.Model):
     status = models.CharField(max_length=255,null=True,blank=True,choices=VARIANT)
     available = models.BooleanField(default=True)
     tags = TaggableManager(blank=True)
+    like = models.ManyToManyField(User, blank=True, related_name='product_like')
+    total_like = models.ImageField(default=0)
+    dislike = models.ManyToManyField(User, blank=True, related_name='product_dislike')
+    total_dislike = models.ImageField(default=0)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
 
@@ -57,6 +62,14 @@ class Product(models.Model):
             total = (self.discount * self.price) / 100
             return int(self.price - total)
         return self.sale_price
+    
+
+    def total_like(self):
+        return self.like.count()
+    
+
+    def total_dislike(self):
+        return self.dislike.count()
     
 
     def get_absolute_url(self):
