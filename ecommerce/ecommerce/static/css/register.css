@@ -1,5 +1,5 @@
 form{
-    background-color: #333;
+    background-color: #2c2b2b;
     margin: 15px auto;
     width: 400px;
     padding: 40px;
@@ -27,5 +27,5 @@ form button{
 }
 
 form button:hover{
-    background: darkslategray;
+    background: rgb(43, 78, 78);
 }

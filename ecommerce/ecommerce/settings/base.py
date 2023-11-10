@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'phone_field',
+    'ckeditor',
+    'ckeditor_uploader',
     'home',
     'account',
 ]
@@ -132,3 +134,11 @@ MEDIA_ROOT = BASE_DIR / 'static/media'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+CKEDITOR_UPLOAD_PATH = 'ckeditor/'
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar':'full',
+    },
+}

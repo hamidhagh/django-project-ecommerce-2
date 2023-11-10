@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from ckeditor_uploader.fields import RichTextUploadingField
 
 class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,blank=True,related_name='sub')
@@ -21,6 +22,13 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    
+    VARIANT = (
+        ('None','none'),
+        ('size','size'),
+        ('color','color'),
+    )
+
     name = models.CharField(max_length=255)
     slug = models.SlugField(allow_unicode=True,unique=True)
     Category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -28,8 +36,9 @@ class Product(models.Model):
     price = models.PositiveIntegerField()
     discount = models.PositiveIntegerField(null=True,blank=True)
     sale_price = models.PositiveIntegerField()
-    description = models.TextField(null=True,blank=True)
+    description = RichTextUploadingField(null=True,blank=True)
     image = models.ImageField(upload_to='product')
+    status = models.CharField(max_length=255,null=True,blank=True,choices=VARIANT)
     available = models.BooleanField(default=True)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
@@ -50,3 +59,38 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_info', args=[self.slug])
+    
+
+class Size(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class Color(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class ProductLine(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(allow_unicode=True,unique=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE,null=True,blank=True)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE,null=True,blank=True)
+    amount = models.PositiveIntegerField()
+    price = models.PositiveIntegerField()
+    discount = models.PositiveIntegerField(null=True,blank=True)
+    sale_price = models.PositiveIntegerField()
+    created_time = models.DateTimeField(auto_now_add=True)
+    modified_time = models.DateTimeField(auto_now=True)
+    
+
+    def __str__(self):
+        return self.name
+    
+    @property
+    def sale_price(self):
+        if not self.discount:
+            return self.price
+        elif self.discount:
+            total = (self.discount * self.price) / 100
+            return int(self.price - total)
+        return self.sale_price
