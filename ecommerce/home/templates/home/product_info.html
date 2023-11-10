@@ -26,4 +26,10 @@ product
             {% endfor %}
         </form>
     {% endif %}
+    <hr>
+    {% for tag in similar %}
+        <a href="{% url 'product_info tag.id' %}"
+        <img src="{{ tag.image.url }}" style="width:300px; height:300px" alt="">
+    {% endfor %}
+
 {% endblock %}

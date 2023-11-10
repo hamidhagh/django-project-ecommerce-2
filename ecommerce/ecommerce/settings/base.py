@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'phone_field',
     'ckeditor',
     'ckeditor_uploader',
+    'taggit',
     'home',
     'account',
 ]
@@ -142,3 +143,5 @@ CKEDITOR_CONFIGS = {
         'toolbar':'full',
     },
 }
+
+TAGGIT_CASE_INSENSITIVE = True

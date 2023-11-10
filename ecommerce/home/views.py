@@ -22,6 +22,7 @@ def all_products(request,slug=None,id=None):
 
 def product_info(request,id):
     product = get_object_or_404(Product,id=id)
+    similar = product.tags.similar_objects()[:2]
     if product.status != 'None':
         if request.method == 'POST':
             product_line = ProductLine.objects.filter(product_id=id)
@@ -30,8 +31,8 @@ def product_info(request,id):
         else:
             product_line = ProductLine.objects.filter(product_id=id)
             chosen_product_line = ProductLine.objects.get(id=product_line[0].id)
-        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line}
+        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,'similar':similar}
         return render(request, 'home/product_info.html', context)
     else:
 
-        return render(request, 'home/product_info.html', {'product':product})
+        return render(request, 'home/product_info.html', {'product':product,'similar':similar})
