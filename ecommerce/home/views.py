@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Category, Product, ProductLine
+from django.contrib import messages
+from .models import Category, Product, ProductLine, Comment
+from .forms import CommentForm, ReplyForm
 
 
 
@@ -9,11 +11,11 @@ def home(request):
     return render(request, 'home/home.html', context)
 
 
-def all_products(request,slug=None,id=None):
+def all_products(request,id=None):
     products = Product.objects.all()
     category = Category.objects.filter(sub_category=False)
-    if slug and id:
-        data = get_object_or_404(Category,slug=slug)
+    if id:
+        data = get_object_or_404(Category,id=id)
         products = Product.objects.filter(category=data)
 
     context = {'products':products, 'category':category}
@@ -22,6 +24,9 @@ def all_products(request,slug=None,id=None):
 
 def product_info(request,id):
     product = get_object_or_404(Product,id=id)
+    Comment_form = CommentForm()
+    reply_form = ReplyForm()
+    comments = Comment.objects.filter(product_id=id,is_reply=False)
     similar = product.tags.similar_objects()[:2]
     is_like = False
     if product.like.filter(id=request.user.id).exists():
@@ -39,11 +44,11 @@ def product_info(request,id):
         else:
             product_line = ProductLine.objects.filter(product_id=id)
             chosen_product_line = ProductLine.objects.get(id=product_line[0].id)
-        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,'similar':similar,'is_like':is_like,'is_dislike':is_dislike}
+        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form}
         return render(request, 'home/product_info.html', context)
     else:
 
-        return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,'is_dislike':is_dislike})
+        return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form})
     
 
 
@@ -75,4 +80,42 @@ def product_dislike(request,id):
         is_dislike = True
     #return redirect('product_info', product.id)
     #return the same page
+    return redirect(url)
+
+
+
+def product_comment(request,id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            data = comment_form.cleaned_data
+            Comment.objects.create(comment=data['comment'],rate=data['rate'],user_id=request.user.id,product_id=id)
+            messages.success(request,'thanks for your comment','success')
+            return redirect(url)
+        else:
+            return redirect(url)
+    
+
+def product_comment_reply(request,id,comment_id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        reply_form = ReplyForm(request.POST)
+        if reply_form.is_valid():
+            data = reply_form.cleaned_data
+            Comment.objects.create(comment=data['comment'],product_id=id,user_id=request.user.id,reply_id=comment_id,is_reply=True)
+            messages.success(request,'thanks for your reply','success')
+            return redirect(url)
+        else:
+            return redirect(url)
+        
+
+def product_comment_like(request,id):
+    url = request.META.get('HTTP_REFERER')
+    comment = Comment.objects.get(id=id)
+    if comment.like.filter(id=request.user.id).exists():
+        comment.like.remove(request.user)
+    else:
+        comment.like.add(request.user)
+
     return redirect(url)

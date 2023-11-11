@@ -20,7 +20,7 @@ def user_register(request):
                                      last_name=data['last_name'], password=data['password_1'])
             user.save()
             messages.success(request,'register successful!','success')
-            return redirect('home:home')
+            return redirect('home')
     else:
         form = UserRegisterForm()
     context = {'form':form}
@@ -33,13 +33,13 @@ def user_login(request):
         if form.is_valid():
             data = form.cleaned_data
             try:
-                user = authenticate(request,username=User.objects.get(email=data['user']),password=data['password'])
+                user = authenticate(request,username=User.objects.get(email=data['username']),password=data['password'])
             except:
                 user = authenticate(request,username=data['username'],password=data['password'])
             if user is not None:
                 login(request,user)
                 messages.success(request,'Welcome!','primary')
-                return redirect('home:home')
+                return redirect('home')
             else:
                 messages.error(request,'login failed!','danger')
             
@@ -53,13 +53,13 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     messages.success(request,'logout successful!','primary')
-    return redirect('home:home')
+    return redirect('home')
 
 
 @login_required(login_url='user_login')
 def user_profile(request):
     profile = Profile.objects.get(user_id=request.user.id)
-    return render(request, 'account/profile.html')
+    return render(request, 'account/profile.html', {'profile':profile})
 
 
 

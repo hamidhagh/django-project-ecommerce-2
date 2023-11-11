@@ -18,7 +18,7 @@ class Category(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        return reverse('category', args=[self.slug, self.id])
+        return reverse('category', args=[self.id])
     
 
 
@@ -33,7 +33,7 @@ class Product(models.Model):
 
     name = models.CharField(max_length=255)
     slug = models.SlugField(allow_unicode=True,unique=True)
-    Category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
     price = models.PositiveIntegerField()
     discount = models.PositiveIntegerField(null=True,blank=True)
@@ -73,16 +73,21 @@ class Product(models.Model):
     
 
     def get_absolute_url(self):
-        return reverse('product_info', args=[self.slug])
+        return reverse('product_info', args=[self.id])
     
 
 class Size(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class Color(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
 
 class ProductLine(models.Model):
     name = models.CharField(max_length=255)
@@ -109,3 +114,28 @@ class ProductLine(models.Model):
             total = (self.discount * self.price) / 100
             return int(self.price - total)
         return self.sale_price
+
+
+    # def get_absolute_url(self):
+    #     return reverse('product_info', args=[self.id])
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    comment = models.TextField()
+    rate = models.PositiveIntegerField(default=1)
+    created_time = models.DateTimeField(auto_now_add=True)
+    reply = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='comment_reply')
+    is_reply = models.BooleanField(default=False)
+    like = models.ManyToManyField(User,blank=True,related_name='comment_like')
+    like_number = models.PositiveIntegerField(default=0)
+
+
+    def like_number(self):
+        return self.like.count()
+
+
+    def __str__(self):
+        return self.product.name
+

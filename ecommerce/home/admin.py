@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductLine, Size, Color
+from .models import Category, Product, ProductLine, Size, Color, Comment
 
 
 class ProductLineInline(admin.TabularInline):
@@ -22,9 +22,15 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductLineInline]
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created_time', 'rate']
 
-admin.site.register(Category,CategoryAdmin)
+
+
+
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product)
 admin.site.register(ProductLine)
 admin.site.register(Size)
 admin.site.register(Color)
+admin.site.register(Comment, CommentAdmin)
