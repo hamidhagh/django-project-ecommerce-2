@@ -1,0 +1,97 @@
+{% extends "home/base.html" %}
+{% block title %} 
+cart
+{% endblock %}
+{% block body %}
+<h1>cart</h1>
+
+    <div class="container">
+        <div class="row">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">image</th>
+                        <th scope="col">product</th>
+                        <th scope="col">size</th>
+                        <th scope="col">color</th>
+                        <th scope="col">price</th>
+                        <th scope="col">quantity</th>
+                        <th scope="col">total price</th>
+                        <th scope="col">delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    {% for crt in cart %}   
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><img src="{{ crt.product.image.url }}" style="width:100px" alt=""></td>
+                        <td>{{ crt.product.name }}</td>
+                        <td>{{ crt.product_line.size }}</td>
+                        <td>{{ crt.product_line.color }}</td>
+                        <td>
+                            {% if crt.product.status != 'None' %}
+                                {{ crt.product_line.sale_price }}
+                            {% else %}
+                                {{ crt.product.sale_price }}
+                            {% endif %}
+                        </td>
+                        <td>{{ crt.quantity }}</td>
+                        <td>
+                            {% if crt.product.status != 'None' %}
+                                {% widthratio crt.product_line.sale_price 1 crt.quantity %}
+                            {% else %}
+                                {% widthratio crt.product.sale_price 1 crt.quantity %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'cart_delete' crt.id %}"><i class="fa fa-trash" style="color:red"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="7">total</td>
+                        <td>{{ total }}</td>
+
+
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <form method="post" action="{% url 'order-create' %}">
+                {% csrf_token %}
+                <div class="card" style="padding:10px">
+                    <label for="">email:
+                        <input type="email" name="email" value="{{ user.email }}" required>
+                    </label>
+                    <label for="">first name:
+                        <input type="text" name="first_name" value="{{ user.first_name }}" required>
+                    </label>
+                    <label for="">last_name:
+                        <input type="text" name="last_name" value="{{ user.last_name }}" required>
+                    </label>
+                    <label for="">address:
+                        <input type="text" name="address" value="{{ user.profile.address }}" required>
+                    </label>
+                    
+                </div>
+                <br>
+                <button type="submit" class="btn btn-outline-danger">order</button>
+            </form>
+        </div>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+{% endblock %}

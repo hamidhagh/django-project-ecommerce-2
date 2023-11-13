@@ -64,6 +64,14 @@ class Product(models.Model):
         return self.sale_price
     
 
+    def average(self):
+        data = Comment.objects.filter(is_reply=False,product=self).aggregate(avg=models.Avg('rate'))
+        star = 0
+        if data['avg'] is not None:
+            star = round(data['avg'],1)
+        return star
+
+
     def total_like(self):
         return self.like.count()
     
@@ -139,3 +147,8 @@ class Comment(models.Model):
     def __str__(self):
         return self.product.name
 
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    name = models.CharField(max_length=100,blank=True)
+    image = models.ImageField(upload_to='image/',blank=True)

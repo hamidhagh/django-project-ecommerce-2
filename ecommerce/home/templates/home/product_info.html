@@ -9,6 +9,7 @@ product
 {% block body %} 
     <div class="container">
         <h1>{{ chosen_product_line.name }}</h1>
+        <h4>rate: {{ product.average }}</h4>
         <img src="{{ product.image.url }}" style="width:300px; height:300px" alt="">
         <p>{{ product.description | safe }}</p>
         <h5>like: {{ product.total_like }}</h5>
@@ -49,6 +50,28 @@ product
                 {% endfor %}
             </form>
         {% endif %}
+
+        <div class="card">
+            {% if product.status != 'None' %}
+                <form method="post" action="{% url 'cart_add' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="select" value="{{ chosen_product_line.id }}">
+                    <input type="number" name="quantity" min="1" value="1" max="{{ chosen_product_line.amount }}" required oninvalid="setCustomValidity('It must be under {{ chosen_product_line.amount }}')">
+                    <button type="submit">Add to cart</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'cart_add' product.id %}">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" min="1" value="1" max="{{ product.amount }}" required oninvalid="setCustomValidity('It must be under {{ product.amount }}')">
+                    <button type="submit">Add to cart</button>
+                </form>
+            {% endif %}
+        </div>
+
+
+
+
+
         <hr>
         {% for tag in similar %}
             <a href="{% url 'product_info tag.id' %}">
@@ -89,7 +112,7 @@ product
                                             <input type="radio" name="rate" value="1" id="1"><label for="1">&star;</label>
                                         </div>
                                         <div class="comment-box">
-                                            <textarea name="comment" class="form-control" id="comment" placeholder="comment ..." rows="4" required oninvalid="setCustomValidaty('Write your comment')"></textarea>
+                                            <textarea name="comment" class="form-control" id="comment" placeholder="comment ..." rows="4" required oninvalid="setCustomValidity('Write your comment')"></textarea>
                                         </div>
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-primary">send comment</button>
@@ -138,7 +161,7 @@ product
                     </div>
                     <form action="{% url 'product-comment-reply' product.id comment.id %}" method="post">
                         {% csrf_token %}
-                        <textarea name="comment" id="comment" placeholder="reply ..." class="form-control" rows="4" required oninvalid="setCustomValidaty('Write your comment')"></textarea>
+                        <textarea name="comment" id="comment" placeholder="reply ..." class="form-control" rows="4" required oninvalid="setCustomValidity('Write your comment')"></textarea>
                         <div class="mt-2">
                             <button type="submit" class="btn btn-primary">Send reply</button>
                         </div>

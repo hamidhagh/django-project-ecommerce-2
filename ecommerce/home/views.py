@@ -1,7 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Category, Product, ProductLine, Comment
-from .forms import CommentForm, ReplyForm
+from django.db.models import Q
+from .models import Category, Product, ProductLine, Comment, ProductImage
+from .forms import CommentForm, ReplyForm, SearchForm
+from cart.models import Cart
+from cart.forms import CartForm
 
 
 
@@ -13,17 +16,26 @@ def home(request):
 
 def all_products(request,id=None):
     products = Product.objects.all()
+    form = SearchForm()
     category = Category.objects.filter(sub_category=False)
+    if 'search' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            data = form.cleaned_data['search']
+            products = products.filter(Q(name__icontains=data)|Q(description__icontains=data))
+    
     if id:
         data = get_object_or_404(Category,id=id)
         products = Product.objects.filter(category=data)
 
-    context = {'products':products, 'category':category}
+    context = {'products':products, 'category':category, 'form':form}
     return render(request, 'home/products.html', context)
 
 
 def product_info(request,id):
     product = get_object_or_404(Product,id=id)
+    images = ProductImage.objects.filter(product_id=id)
+    cart_form = CartForm()
     Comment_form = CommentForm()
     reply_form = ReplyForm()
     comments = Comment.objects.filter(product_id=id,is_reply=False)
@@ -44,11 +56,11 @@ def product_info(request,id):
         else:
             product_line = ProductLine.objects.filter(product_id=id)
             chosen_product_line = ProductLine.objects.get(id=product_line[0].id)
-        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form}
+        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form}
         return render(request, 'home/product_info.html', context)
     else:
 
-        return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form})
+        return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form})
     
 
 
@@ -119,3 +131,17 @@ def product_comment_like(request,id):
         comment.like.add(request.user)
 
     return redirect(url)
+
+
+def product_search(request):
+    products = Product.objects.all()
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data['search']
+            if data.isdigit():
+                products = products.filter(Q(discount__icontains=data)|Q(sale_price__icontains=data))
+            else:
+                #products = products.filter(name__icontains=data)
+                products = products.filter(Q(name__icontains=data)|Q(description__icontains=data))
+            return render(request, 'home/products.html', {'products':products,'form':form})

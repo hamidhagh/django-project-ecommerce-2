@@ -1,11 +1,18 @@
 from django.contrib import admin
-from .models import Category, Product, ProductLine, Size, Color, Comment
+from .models import Category, Product, ProductLine, Size, Color, Comment, ProductImage
+import admin_thumbnails
 
 
 class ProductLineInline(admin.TabularInline):
     model = ProductLine
     #extra = 5
 
+
+@admin_thumbnails.thumbnail('image')
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+
+    
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_time', 'modified_time','parent')
@@ -19,7 +26,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = ('amount',)
     prepopulated_fields = {'slug':('name',)}
     raw_id_fields = ('category',)
-    inlines = [ProductLineInline]
+    inlines = [ProductLineInline, ProductImageInline]
 
 
 class CommentAdmin(admin.ModelAdmin):
@@ -34,3 +41,4 @@ admin.site.register(ProductLine)
 admin.site.register(Size)
 admin.site.register(Color)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(ProductImage)

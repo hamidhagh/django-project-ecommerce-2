@@ -23,6 +23,8 @@ urlpatterns = [
     path('', include('home.urls')),
     path('account/', include('account.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('cart/', include('cart.urls')),
+     path('order/', include('order.urls')),
 ]
 
 urlpatterns += static(settings.local.MEDIA_URL, document_root=settings.local.MEDIA_ROOT)
