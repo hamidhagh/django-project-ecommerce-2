@@ -6,6 +6,7 @@ from home.models import Product,ProductLine
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     create_time = models.DateTimeField(auto_now_add=True)
+    discount = models.PositiveIntegerField(null=True, blank=True)
     paid = models.BooleanField(default=False)
     email = models.EmailField()
     first_name = models.CharField(max_length=255)
@@ -14,6 +15,15 @@ class Order(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+
+    def get_total_price(self):
+        total = sum(i.total_price() for i in self.order_item.all())
+        if self.discount:
+            discount_price = (self.discount / 100) * total
+            return int(total - discount_price)
+        return total
+
     
 
 class OrderItem(models.Model):
@@ -36,3 +46,17 @@ class OrderItem(models.Model):
         return self.product_line.color.name
     
 
+    def total_price(self):
+        if self.product.status != 'None':
+            return self.product_line.sale_price * self.quantity
+        else:
+            return self.product.sale_price * self.quantity
+
+    
+
+class DiscountCode(models.Model):
+    code = models.CharField(max_length=100,unique=True)
+    is_active = models.BooleanField(default=False)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    discount = models.IntegerField()
