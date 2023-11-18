@@ -1,0 +1,16 @@
+{% extends "home/base.html" %}
+{% block title %} 
+history
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="card mt-3 p-5">
+            {% for item in data %}
+                <h2>name: {{ item.product.name }} &nbsp price: {{ item.order.get_total_price }}</h2>
+                <img src="{{ item.product.image.url }}" style="height:200px;width:200px" alt="">
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

@@ -11,6 +11,7 @@ class Profile(models.Model):
     phone = models.IntegerField(null=True,blank=True)
     address = models.CharField(max_length=255,null=True,blank=True)
     user = models.OneToOneField(User,on_delete=models.CASCADE)
+    photo = models.ImageField(upload_to='profile/', default='default.jpg')
 
     def __str__(self):
         return self.user.username

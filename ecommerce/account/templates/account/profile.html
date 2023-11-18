@@ -3,28 +3,37 @@
 profile
 {% endblock %}
 {% block body %} 
-    <h1>profile</h1>
-    <table>
-        <tr>
-            <th>user: {{ profile.user.username }}</th>
-        </tr>
-        <tr>
-            <th>first name: {{ profile.user.first_name }}</th>
-        </tr>
-        <tr>
-            <th>last name: {{ profile.user.last_name }}</th>
-        </tr>
-        <tr>
-            <th>email: {{ profile.user.email }}</th>
-        </tr>
-        <tr>
-            <th>phone: {{ profile.phone }}</th>
-        </tr>
-        <tr>
-            <th>address: {{ profile.address }}</th>
-        </tr>
-    </table>
-    <a href={% url 'user_update' %}>update profile</a>
-    <br>
-    <a href={% url 'change_password' %}>change password</a>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-6">
+                <h1>profile</h1>
+                <table>
+                    <tr>
+                        <th>user: {{ profile.user.username }}</th>
+                    </tr>
+                    <tr>
+                        <th>first name: {{ profile.user.first_name }}</th>
+                    </tr>
+                    <tr>
+                        <th>last name: {{ profile.user.last_name }}</th>
+                    </tr>
+                    <tr>
+                        <th>email: {{ profile.user.email }}</th>
+                    </tr>
+                    <tr>
+                        <th>phone: {{ profile.phone }}</th>
+                    </tr>
+                    <tr>
+                        <th>address: {{ profile.address }}</th>
+                    </tr>
+                </table>
+                <a href={% url 'user_update' %}>update profile</a>
+                <br>
+                <a href={% url 'change_password' %}>change password</a>
+            </div>
+            <div class="col-6">
+                <img src="{{ profile.photo.url }}" sstyle="width:300px;height:200px;" alt="">
+            </div>
+        </div>
+
 {% endblock %}

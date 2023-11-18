@@ -1,10 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Max, Min
 from .models import Category, Product, ProductLine, Comment, ProductImage
 from .forms import CommentForm, ReplyForm, SearchForm
 from cart.models import Cart
 from cart.forms import CartForm
+from django.core.mail import EmailMessage
+from django.core.paginator import Paginator
+
+from .filters import ProductFilter
 
 
 
@@ -16,6 +20,18 @@ def home(request):
 
 def all_products(request,id=None):
     products = Product.objects.all()
+
+    min = Product.objects.aggregate(price=Min('price'))
+    min_price = int(min['price'])
+    max = Product.objects.aggregate(price=Max('price'))
+    max_price = int(max['price'])
+    filter = ProductFilter(request.GET, queryset=products)
+    products = filter.qs
+
+    paginator = Paginator(products, 10)
+    page_num = request.GET.get('page')
+    page_obj = paginator.get_page(page_num)
+
     form = SearchForm()
     category = Category.objects.filter(sub_category=False)
     if 'search' in request.GET:
@@ -26,9 +42,13 @@ def all_products(request,id=None):
     
     if id:
         data = get_object_or_404(Category,id=id)
-        products = Product.objects.filter(category=data)
+        page_obj = Product.objects.filter(category=data)
+        paginator = Paginator(page_obj,10)
+        page_num = request.GET.get('page')
+        page_obj = paginator.get_page(page_num)
 
-    context = {'products':products, 'category':category, 'form':form}
+    context = {'products':page_obj, 'category':category, 'form':form, 'page_num':page_num, 'filter':filter,
+               'min_price':min_price, 'max_price':max_price}
     return render(request, 'home/products.html', context)
 
 
@@ -48,6 +68,10 @@ def product_info(request,id):
     if product.dislike.filter(id=request.user.id).exists():
         is_dislike = True
 
+    is_favorite = False
+    if product.favorite.filter(id=request.user.id).exists():
+        is_favorite = True
+
     if product.status != 'None':
         if request.method == 'POST':
             product_line = ProductLine.objects.filter(product_id=id)
@@ -56,11 +80,16 @@ def product_info(request,id):
         else:
             product_line = ProductLine.objects.filter(product_id=id)
             chosen_product_line = ProductLine.objects.get(id=product_line[0].id)
-        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form}
+        context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,
+                   'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,
+                   'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form,'is_favorite':is_favorite}
+        
         return render(request, 'home/product_info.html', context)
     else:
 
-        return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form})
+        return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,
+                                                          'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,
+                                                          'reply_form':reply_form,'images':images,'cart_form':cart_form,'is_favorite':is_favorite})
     
 
 
@@ -145,3 +174,36 @@ def product_search(request):
                 #products = products.filter(name__icontains=data)
                 products = products.filter(Q(name__icontains=data)|Q(description__icontains=data))
             return render(request, 'home/products.html', {'products':products,'form':form})
+
+
+
+def product_favorite(request,id):
+    url = request.META.get('HTTP_REFERER')
+    product = Product.objects.get(id=id)
+    is_favorite = False
+    if product.favorite.filter(id=request.user.id).exists():
+        product.favorite.remove(request.user)
+        is_favorite = False
+    else:
+        product.favorite.add(request.user)
+        is_favorite = True
+    return redirect(url)
+
+
+
+def contact(request):
+    if request.method == 'POST':
+        #if dont want to use forms
+        subject = request.POST['subject']
+        email = request.POST['email']
+        message = request.POST['message']
+        body = subject + '\n' + email + '\n' + message
+        form = EmailMessage(
+            'contact form',
+            body,
+            'test',
+            ('hamidhaghverdi12345@gmail.com',),
+        )
+        form.send(fail_silently=False)
+
+    return render(request, 'account/contact.html')

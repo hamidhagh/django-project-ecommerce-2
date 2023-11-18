@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductLine, Size, Color, Comment, ProductImage
+from .models import Category, Product, ProductLine, Size, Color, Comment, ProductImage, Brand
 import admin_thumbnails
 
 
@@ -42,3 +42,4 @@ admin.site.register(Size)
 admin.site.register(Color)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(ProductImage)
+admin.site.register(Brand)

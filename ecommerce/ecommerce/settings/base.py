@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'phone_field',
     'ckeditor',
     'ckeditor_uploader',
+    'sorl.thumbnail',
     'taggit',
+    'django_filters',
     'home',
     'account',
     'cart',
@@ -147,3 +149,12 @@ CKEDITOR_CONFIGS = {
 }
 
 TAGGIT_CASE_INSENSITIVE = True
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
+
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')

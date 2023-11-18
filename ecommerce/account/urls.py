@@ -10,4 +10,7 @@ urlpatterns = [
     path('change_password/', views.change_password, name='change_password'),
     # path('login_phone/', views.login_phone, name='login_phone'),
     # path('phone_verify/', views.phone_verify, name='phone_verify'),
+    #path('activate/<uidb64>/<token>/', views.EmailRegister.as_view(), name='email-register')
+    path('favorite-products/', views.favorite_products, name='favorite-products'),
+    path('history/', views.history, name='history'),
 ]

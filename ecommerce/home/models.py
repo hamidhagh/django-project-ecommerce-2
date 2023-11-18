@@ -22,6 +22,12 @@ class Category(models.Model):
     
 
 
+class Brand(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 
 class Product(models.Model):
     
@@ -34,12 +40,15 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(allow_unicode=True,unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True)
     amount = models.PositiveIntegerField()
     price = models.PositiveIntegerField()
     discount = models.PositiveIntegerField(null=True,blank=True)
     sale_price = models.PositiveIntegerField()
     description = RichTextUploadingField(null=True,blank=True)
     image = models.ImageField(upload_to='product')
+    color = models.ManyToManyField('Color', blank=True)
+    size = models.ManyToManyField('Size', blank=True)
     status = models.CharField(max_length=255,null=True,blank=True,choices=VARIANT)
     available = models.BooleanField(default=True)
     tags = TaggableManager(blank=True)
@@ -47,6 +56,7 @@ class Product(models.Model):
     total_like = models.ImageField(default=0)
     dislike = models.ManyToManyField(User, blank=True, related_name='product_dislike')
     total_dislike = models.ImageField(default=0)
+    favorite = models.ManyToManyField(User, blank=True, related_name='user_favorite')
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
 

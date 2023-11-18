@@ -13,8 +13,16 @@ product
         <img src="{{ product.image.url }}" style="width:300px; height:300px" alt="">
         <p>{{ product.description | safe }}</p>
         <h5>like: {{ product.total_like }}</h5>
+
         {% if request.user.is_authenticated %}
 
+            {% if is_favorite %}
+                <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart" style"color:red;font-size:24px"></i></a>
+            {% else %}
+            <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart-o" style"color:red;font-size:24px"></i></a>
+            {% endif %}
+
+            
             {% if is_like %}
                 <a href="{% url 'product-like' product.id %}" class="btn btn-primary {% if is_dislike %} disabled {% endif %}">disLike</a>
             {% else %}

@@ -1,0 +1,20 @@
+{% extends "home/base.html" %}
+{% block title %} 
+favorite products
+{% endblock %}
+{% block body %} 
+
+    <div class="container">
+        <div class="card mt-3 p-5">
+            <h1>favorite products</h1>
+            {% for product in favorite_products %}
+                <a href="{% url 'product_info' product.id %}">
+                    <img src="{{ product.image.url }}" stytle="width:200;height:250px" alt="">
+                </a>
+                <a href="{% url 'product_info' product.id %}">
+                    <h1>{{ product.name }}</h1>
+                </a>
+        </div>
+    </div>
+
+{% endblock %}

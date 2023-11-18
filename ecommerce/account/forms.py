@@ -59,7 +59,7 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['phone','address']
+        fields = ['phone','address', 'photo']
 
 
 # class PhoneForm(forms.Form):

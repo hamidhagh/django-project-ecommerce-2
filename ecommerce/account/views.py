@@ -4,11 +4,30 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
+# from django.core.mail import EmailMessage
+# from django.views import View
+# from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+# from django.contrib.sites.shortcuts import get_current_site
+# from django.utils.encoding import force_bytes
+# from django.contrib.auth.tokens import PasswordResetTokenGenerator
+# from six import text_type
+# from django.urls import reverse
 
 from random import randint
 
 from .models import Profile
 from .forms import UserRegisterForm, UserLoginForm, UserUpdateForm, ProfileUpdateForm
+
+from order.models import OrderItem
+
+
+
+
+# class EmailToken(PasswordResetTokenGenerator):
+#     def _make_hash_value(self, user, timestamp):
+#         return (text_type(user.is_active) + text_type(user.id) + text_type(timestamp))
+    
+# email_generator = EmailToken()
 
 
 def user_register(request):
@@ -18,8 +37,20 @@ def user_register(request):
             data = form.cleaned_data
             user = User.objects.create_user(username=data['username'],email=data['email'],first_name=data['first_name'],
                                      last_name=data['last_name'], password=data['password_1'])
+            #user.is_active = False
             user.save()
-            messages.success(request,'register successful!','success')
+            # domain = get_current_site(request).domain
+            # uidb64 = urlsafe_base64_encode(force_bytes(user.id))
+            # url = reverse('email-register', kwargs={'uidb64':uidb64,'token':email_generator.make_token()})
+            # link = 'http://'+ domain + url
+            # email = EmailMessage(
+            #     'active user',
+            #     link,
+            #     'hamidhaghverdi12345@gmail.com',
+            #     [data['email']],
+            # )
+            # email.send(fail_silently=False)
+            messages.success(request,'check your email','success')
             return redirect('home')
     else:
         form = UserRegisterForm()
@@ -49,6 +80,17 @@ def user_login(request):
     return render(request, 'account/login.html', context)
 
 
+
+
+# class EmailRegister(View):
+#     def get(self,request):
+#         id = force_text(urlsafe_base64_decode())
+#         return redirect('user_login')
+
+    
+
+
+
 @login_required(login_url='user_login')
 def user_logout(request):
     logout(request)
@@ -67,7 +109,7 @@ def user_profile(request):
 def user_update(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST,instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST,instance=request.user.profile)
+        profile_form = ProfileUpdateForm(request.POST,request.FILES,instance=request.user.profile)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -136,3 +178,15 @@ def change_password(request):
 #     else:
 #         form = PhoneVerifyForm()
 #     return render(request, 'account/phone_verify.html', {'form':form})
+
+
+
+def favorite_products(request):
+    favorite_products = request.user.user_favorite.all()
+    return render(request, 'account/favorite-products.html', {'favorite_products':favorite_products})
+
+
+
+def history(request):
+    data = OrderItem.objects.filter(user_id=request.user.id)
+    return render(request, 'account/history.html', {'data':data})
