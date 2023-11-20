@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductLine, Size, Color, Comment, ProductImage, Brand, Chart
+from .models import Category, Product, ProductLine, Size, Color, Comment, ProductImage, Brand, Chart, Compare
 import admin_thumbnails
 
 
@@ -35,6 +35,11 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 
+class CompareAdmin(admin.ModelAdmin):
+    list_display = ['user', 'product', 'session_key']
+
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product)
 admin.site.register(ProductLine)
@@ -44,3 +49,4 @@ admin.site.register(Comment, CommentAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Brand)
 admin.site.register(Chart)
+admin.site.register(Compare,CompareAdmin)

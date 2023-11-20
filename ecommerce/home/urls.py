@@ -14,6 +14,8 @@ urlpatterns = [
     path('search/', views.product_search, name='product-search'),
     path('favorite/<int:id>/', views.product_favorite, name='product-favorite'),
     path('contact/', views.contact, name='contact'),
+    path('compare/<int:id>/', views.compare, name='compare'),
+    path('compare-list/', views.compare_list, name='compare-list'),
 ]
 
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q, Max, Min
-from .models import Category, Product, ProductLine, Comment, ProductImage, Chart
+from .models import Category, Product, ProductLine, Comment, ProductImage, Chart, Compare
 from .forms import CommentForm, ReplyForm, SearchForm
 from cart.models import Cart
 from cart.forms import CartForm
@@ -219,3 +219,39 @@ def contact(request):
         form.send(fail_silently=False)
 
     return render(request, 'account/contact.html')
+
+
+
+def compare(request,id):
+    url = request.META.get('HTTP_REFERER')
+    if request.user.is_authenticated:
+        item = get_object_or_404(Product,id=id)
+        qs = Compare.objects.filter(user_id=request.user.id,product_id=id)
+        if qs.exists():
+            messages.success(request,'the product is already submitted!')
+        else:
+            Compare.objects.create(user_id=request.user.id,product_id=item.id,session_key=None)
+
+    else:
+        item = get_object_or_404(Product,id=id)
+        qs = Compare.objects.filter(user_id=None,product_id=id,session_key=request.session.session_key)
+        if qs.exists():
+            messages.success(request,'the product is already submitted!')
+        else:
+            if not request.session.session_key:
+                request.session.create()
+            Compare.objects.create(user_id=None,product_id=item.id,session_key=request.session.session_key)
+    return redirect(url)
+
+
+
+
+def compare_list(request):
+    if request.user.is_authenticated:
+        data = Compare.objects.filter(user_id=request.user.id)
+        return render(request, 'home/compare.html')
+    
+    else:
+        data = Compare.objects.filter(session_key__exact=request.session.session_key,user_id=None)
+        return render(request, 'home/compare.html', {'data':data})
+

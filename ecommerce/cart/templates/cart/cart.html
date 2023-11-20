@@ -39,7 +39,12 @@ cart
                                 {{ crt.product.sale_price }}
                             {% endif %}
                         </td>
-                        <td>{{ crt.quantity }}</td>
+                        <td>
+                            <a href="{% url 'card-sub-update' crt.id %}"><i class="fa fa-minus"></i></a>
+                            {{ crt.quantity }}
+                            <a href="{% url 'card-add-update' crt.id %}"><i class="fa fa-plus"></i></a>
+                            
+                        </td>
                         <td>
                             {% if crt.product.status != 'None' %}
                                 {% widthratio crt.product_line.sale_price 1 crt.quantity %}

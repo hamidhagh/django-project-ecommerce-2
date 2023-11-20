@@ -105,6 +105,10 @@ products
                             {% else %}
                                 <h4>{{ product.price }}</h4>
                             {% endif %}
+                            <form action="{% url 'compare' product.id %}">
+                                <input type="text" value="{{ product.id }}" name="product">
+                                <button type="submit">compare</button>
+                            </form>
                         </div>
                     {% endfor %}
                 </div>

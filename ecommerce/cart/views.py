@@ -64,3 +64,34 @@ def cart_delete(request,id):
     return redirect(url)
 
 
+
+
+
+def cart_add_update(request,id):
+    url = request.META.get('HTTP_REFERER')
+    cart = Cart.objects.get(id=id)
+    if cart.product.status == 'None':
+        product = Product.objects.get(id=cart.product.id)
+        if product.amount > cart.quantity:
+            cart.quantity += 1
+        
+    else:
+        product_line = ProductLine.objects.get(id=cart.product_line.id)
+        if product_line.amount > cart.quantity:
+            cart.quantity += 1
+    cart.save()
+    return redirect(url)
+
+
+
+
+def cart_sub_update(request,id):
+    url = request.META.get('HTTP_REFERER')
+    cart = Cart.objects.get(id=id)
+    if cart.quantity < 2:
+        cart.delete()
+    else:
+        cart.quantity -= 1
+        cart.save()
+    return redirect(url)
+

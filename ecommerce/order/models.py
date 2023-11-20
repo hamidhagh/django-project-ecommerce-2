@@ -12,6 +12,7 @@ class Order(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     address = models.CharField(max_length=1000)
+    code = models.CharField(max_length=100,null=True)
 
     def __str__(self):
         return self.user.username

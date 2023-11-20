@@ -206,3 +206,13 @@ def product_line_post_save(sender,instance,created,*args,**kwargs):
 
 
 post_save.connect(product_line_post_save,sender=Product)
+
+
+
+class Compare(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=100, null=True,blank=True)
+
+    def __str__(self):
+        return self.product.name

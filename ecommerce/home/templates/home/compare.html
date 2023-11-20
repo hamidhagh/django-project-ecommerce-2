@@ -1,0 +1,14 @@
+{% extends "home/base.html" %}
+{% block title %} 
+compare products
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        {% for i in data %}
+            <h5>{{ i.product.name }}</h5>
+        {{ endfor }}
+    </div>
+
+{% endblock %}
