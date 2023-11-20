@@ -13,4 +13,5 @@ urlpatterns = [
     #path('activate/<uidb64>/<token>/', views.EmailRegister.as_view(), name='email-register')
     path('favorite-products/', views.favorite_products, name='favorite-products'),
     path('history/', views.history, name='history'),
+    path('product-view/', views.product_view, name='product-view'),
 ]

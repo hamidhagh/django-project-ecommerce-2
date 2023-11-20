@@ -1,0 +1,12 @@
+{% extends "home/base.html" %}
+{% block title %} 
+recent views
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {% for product in products %}
+            <p>{{ product.name }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

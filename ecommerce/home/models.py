@@ -62,6 +62,8 @@ class Product(models.Model):
     total_favorite = models.IntegerField(default=0)
     sold = models.IntegerField(default=0)
     change = models.BooleanField(default=False)
+    view = models.ManyToManyField(User, blank=True, related_name='product_view')
+    total_view = models.IntegerField(default=0)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
 
@@ -213,6 +215,17 @@ class Compare(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     session_key = models.CharField(max_length=100, null=True,blank=True)
+
+    def __str__(self):
+        return self.product.name
+
+
+
+class View(models.Model):
+    ip = models.CharField(max_length=200, null=True, blank=True)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return self.product.name

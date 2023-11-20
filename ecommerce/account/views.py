@@ -19,6 +19,7 @@ from .models import Profile
 from .forms import UserRegisterForm, UserLoginForm, UserUpdateForm, ProfileUpdateForm
 
 from order.models import OrderItem
+from home.models import Product
 
 
 
@@ -190,3 +191,9 @@ def favorite_products(request):
 def history(request):
     data = OrderItem.objects.filter(user_id=request.user.id)
     return render(request, 'account/history.html', {'data':data})
+
+
+
+def product_view(request):
+    products = Product.objects.filter(view=request.user.id)
+    return render(request, 'account/product-view.html', {'products':products})

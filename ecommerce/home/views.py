@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q, Max, Min
-from .models import Category, Product, ProductLine, Comment, ProductImage, Chart, Compare
+from .models import Category, Product, ProductLine, Comment, ProductImage, Chart, Compare, View
 from .forms import CommentForm, ReplyForm, SearchForm
 from cart.models import Cart
 from cart.forms import CartForm
@@ -58,6 +58,14 @@ def all_products(request,id=None):
 
 def product_info(request,id):
     product = get_object_or_404(Product,id=id)
+    ip = request.META.get('REMOTE_ADDR')
+    view = View.objects.filter(product_id=product.id,ip=ip)
+    if not view.exists():
+        View.objects.create(product_id=product.id,ip=ip)
+        product.total_view += 1
+        product.save()
+    if request.user.is_authenticated:
+        product.add(request.user)
     images = ProductImage.objects.filter(product_id=id)
     cart_form = CartForm()
     Comment_form = CommentForm()
