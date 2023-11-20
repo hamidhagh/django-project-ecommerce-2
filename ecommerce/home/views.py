@@ -1,12 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q, Max, Min
-from .models import Category, Product, ProductLine, Comment, ProductImage
+from .models import Category, Product, ProductLine, Comment, ProductImage, Chart
 from .forms import CommentForm, ReplyForm, SearchForm
 from cart.models import Cart
 from cart.forms import CartForm
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
+from urllib.parse import urlencode
 
 from .filters import ProductFilter
 
@@ -30,6 +31,9 @@ def all_products(request,id=None):
 
     paginator = Paginator(products, 10)
     page_num = request.GET.get('page')
+    filters = request.GET.copy()
+    if 'page' in filters:
+        del filters['page']
     page_obj = paginator.get_page(page_num)
 
     form = SearchForm()
@@ -48,7 +52,7 @@ def all_products(request,id=None):
         page_obj = paginator.get_page(page_num)
 
     context = {'products':page_obj, 'category':category, 'form':form, 'page_num':page_num, 'filter':filter,
-               'min_price':min_price, 'max_price':max_price}
+               'min_price':min_price, 'max_price':max_price, 'filters':urlencode(filters)}
     return render(request, 'home/products.html', context)
 
 
@@ -59,6 +63,8 @@ def product_info(request,id):
     Comment_form = CommentForm()
     reply_form = ReplyForm()
     comments = Comment.objects.filter(product_id=id,is_reply=False)
+    update = Chart.objects.filter(product_id=id)
+    change = Chart.objects.all()
     similar = product.tags.similar_objects()[:2]
     is_like = False
     if product.like.filter(id=request.user.id).exists():
@@ -82,14 +88,16 @@ def product_info(request,id):
             chosen_product_line = ProductLine.objects.get(id=product_line[0].id)
         context = {'product':product,'product_line':product_line,'chosen_product_line':chosen_product_line,
                    'similar':similar,'is_like':is_like,'is_dislike':is_dislike,'comment_form':Comment_form,
-                   'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form,'is_favorite':is_favorite}
+                   'comments':comments,'reply_form':reply_form,'images':images,'cart_form':cart_form,
+                   'is_favorite':is_favorite,'update':update,'change':change}
         
         return render(request, 'home/product_info.html', context)
     else:
 
         return render(request, 'home/product_info.html', {'product':product,'similar':similar,'is_like':is_like,
                                                           'is_dislike':is_dislike,'comment_form':Comment_form,'comments':comments,
-                                                          'reply_form':reply_form,'images':images,'cart_form':cart_form,'is_favorite':is_favorite})
+                                                          'reply_form':reply_form,'images':images,'cart_form':cart_form,
+                                                          'is_favorite':is_favorite,'update':update,'change':change})
     
 
 
@@ -183,9 +191,13 @@ def product_favorite(request,id):
     is_favorite = False
     if product.favorite.filter(id=request.user.id).exists():
         product.favorite.remove(request.user)
+        product.total_favorite -= 1
+        product.save()
         is_favorite = False
     else:
         product.favorite.add(request.user)
+        product.total_favorite += 1
+        product.save()
         is_favorite = True
     return redirect(url)
 

@@ -61,14 +61,14 @@ product
 
         <div class="card">
             {% if product.status != 'None' %}
-                <form method="post" action="{% url 'cart_add' product.id %}">
+                <form method="post" action="{% url 'cart-add' product.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="select" value="{{ chosen_product_line.id }}">
                     <input type="number" name="quantity" min="1" value="1" max="{{ chosen_product_line.amount }}" required oninvalid="setCustomValidity('It must be under {{ chosen_product_line.amount }}')">
                     <button type="submit">Add to cart</button>
                 </form>
             {% else %}
-                <form method="post" action="{% url 'cart_add' product.id %}">
+                <form method="post" action="{% url 'cart-add' product.id %}">
                     {% csrf_token %}
                     <input type="number" name="quantity" min="1" value="1" max="{{ product.amount }}" required oninvalid="setCustomValidity('It must be under {{ product.amount }}')">
                     <button type="submit">Add to cart</button>
@@ -77,9 +77,99 @@ product
         </div>
 
 
+        {% block script %}
+            {% if product.status != 'None' %}
+                <script>
+                        
+                    var ctx = document.getElementById('myChart').getContext('2d'):
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: [{% for i in change %} {% if chosen_product_line.id == i.product_line_id %} '{{ i.update }}' {% endif %} ,{% endfor %}],
+                            datasets: [{
+                                label: '# of votes',
+                                data: [{% for i in change %} {% if chosen_product_line.id == i.product_line_id %} {{ i.price }} {% endif %} ,{% endfor %}],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)',
+                                    'rgba(255, 205, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgb(255, 99, 132)',
+                                    'rgb(255, 159, 64)',
+                                    'rgb(255, 205, 86)',
+                                    'rgb(75, 192, 192)',
+                                    'rgb(54, 162, 235)',
+                                    'rgb(153, 102, 255)'
+                                ],
+                                borderWidth: 1
 
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
 
+            {% else %}
+                <script>
+                    
+                    var ctx = document.getElementById('myChart').getContext('2d'):
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: [{% for i in update %} '{{ i.modified_time }}' ,{% endfor %}],
+                            datasets: [{
+                                label: '# of votes',
+                                data: [{% for i in update %} {{ i.price }} ,{% endfor %}],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)',
+                                    'rgba(255, 205, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgb(255, 99, 132)',
+                                    'rgb(255, 159, 64)',
+                                    'rgb(255, 205, 86)',
+                                    'rgb(75, 192, 192)',
+                                    'rgb(54, 162, 235)',
+                                    'rgb(153, 102, 255)'
+                                ],
+                                borderWidth: 1
 
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+                  
+            {% endif %}
+        {% endblock %}
+
+        <div class="row">
+            <canvas id="myChart" width="600" height="300"></canvas>
+        </div>
         <hr>
         {% for tag in similar %}
             <a href="{% url 'product_info tag.id' %}">
