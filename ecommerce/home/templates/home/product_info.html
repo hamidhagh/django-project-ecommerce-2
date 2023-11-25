@@ -19,8 +19,17 @@ product
             {% if is_favorite %}
                 <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart" style"color:red;font-size:24px"></i></a>
             {% else %}
-            <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart-o" style"color:red;font-size:24px"></i></a>
+                <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart-o" style"color:red;font-size:24px"></i></a>
             {% endif %}
+
+            {% comment %} ajax {% endcomment %}
+            {% comment %} {% if request.user in product.favorite.all %}
+                <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart" style"color:red;font-size:24px"></i></a>
+            {% else %}
+            <a href="{% url 'product-favorite' product.id %}"><i class="fa fa-heart-o" style"color:red;font-size:24px"></i></a>
+            {% endif %} {% endcomment %}
+
+
 
             
             {% if is_like %}
@@ -39,7 +48,31 @@ product
         {% endif %}
         <br>
         <hr>
-        {% if product.status == 'size' %}
+
+
+        {% if product.status == 'both' %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for data in size %}
+                    <input type="radio" value="{{ data.id }}" {% if chosen_product_line.id == data.id %} checked {% endif %}
+                        name="select" onchange="this.form.submit();">
+                    <a href="" style="text-decoration: none">{{ data.size }}</a>
+                {% endfor %}
+            </form>
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for data in colors %}
+                    <input type="radio" value="{{ data.id }}" {% if chosen_product_line.id == data.id %} checked {% endif %}
+                        name="select" id="select" onchange="this.form.submit();">
+                    <a href="" style="text-decoration: none">{{ data.color }}</a>
+                {% endfor %}
+            </form>
+
+
+
+
+
+        {% elif product.status == 'size' %}
             <form action="" method="post">
                 {% csrf_token %}
                 {% for data in product_line %}
@@ -59,6 +92,7 @@ product
             </form>
         {% endif %}
 
+        {% comment %} ###############################
         <div class="card">
             {% if product.status != 'None' %}
                 <form method="post" action="{% url 'cart-add' product.id %}">
@@ -75,6 +109,22 @@ product
                 </form>
             {% endif %}
         </div>
+
+        ######################## {% endcomment %}
+        <form method="post" action="{% url 'cart-add' %}">
+            {% csrf_token %}
+            <input type="hidden" name="test" value="{{ chosen_product_line.id }}">
+            <input type="number" name="quantity" min="1" value="1" max="{{ chosen_product_line.amount }}" required oninvalid="setCustomValidity('It must be under {{ chosen_product_line.amount }}')">
+            <button type="submit">Add to cart</button>
+        </form>
+
+
+
+
+
+
+
+
 
 
         {% block script %}
@@ -279,3 +329,21 @@ product
 
     </div>
 {% endblock %}
+ajax
+<script>
+    $(document).on('click','.test',function(event){
+        event.preventDefault();
+        $.ajax({
+            url : $(this).attr('href'),
+            type : 'GET',
+            data : $(this).serialize(),
+            dataType : 'json',
+            success : function(response){
+                alert('ok')
+            },
+            error : function(error){
+                alert('error')
+            },
+        });
+    });
+</script>

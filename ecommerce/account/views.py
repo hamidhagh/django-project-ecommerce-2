@@ -19,7 +19,7 @@ from .models import Profile
 from .forms import UserRegisterForm, UserLoginForm, UserUpdateForm, ProfileUpdateForm
 
 from order.models import OrderItem
-from home.models import Product
+from home.models import Product, View
 
 
 
@@ -64,12 +64,17 @@ def user_login(request):
         form = UserLoginForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
+            remember = data['remember']
             try:
                 user = authenticate(request,username=User.objects.get(email=data['username']),password=data['password'])
             except:
                 user = authenticate(request,username=data['username'],password=data['password'])
             if user is not None:
                 login(request,user)
+                if not remember:
+                    request.session.set_expiry(0)
+                else:
+                    request.session.set_expiry(100000)
                 messages.success(request,'Welcome!','primary')
                 return redirect('home')
             else:
@@ -196,4 +201,5 @@ def history(request):
 
 def product_view(request):
     products = Product.objects.filter(view=request.user.id)
+    views = View.objects.filter(id=request.META.get('REMOTE_ADDR')).order_by('-created_time')[:2]
     return render(request, 'account/product-view.html', {'products':products})

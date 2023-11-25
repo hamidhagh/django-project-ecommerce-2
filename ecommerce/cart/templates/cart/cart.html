@@ -1,102 +1,83 @@
-{% extends "home/base.html" %}
-{% block title %} 
-cart
-{% endblock %}
+{% extends 'home/base.html' %}
+
 {% block body %}
-<h1>cart</h1>
-
-    <div class="container">
+    <div class="container mt-5">
         <div class="row">
-
-            <table class="table">
-                <thead>
+            <div class="col-8">
+                <table class="table">
+                    <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">image</th>
                         <th scope="col">product</th>
-                        <th scope="col">size</th>
-                        <th scope="col">color</th>
-                        <th scope="col">price</th>
+                        <th scope="col">id</th>
                         <th scope="col">quantity</th>
-                        <th scope="col">total price</th>
-                        <th scope="col">delete</th>
+                        <th scope="col">price</th>
+                        <th scope="col">remove</th>
                     </tr>
                     </thead>
                     <tbody>
-
-
-                    {% for crt in cart %}   
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><img src="{{ crt.product.image.url }}" style="width:100px" alt=""></td>
-                        <td>{{ crt.product.name }}</td>
-                        <td>{{ crt.product_line.size }}</td>
-                        <td>{{ crt.product_line.color }}</td>
-                        <td>
-                            {% if crt.product.status != 'None' %}
-                                {{ crt.product_line.sale_price }}
-                            {% else %}
-                                {{ crt.product.sale_price }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'card-sub-update' crt.id %}"><i class="fa fa-minus"></i></a>
-                            {{ crt.quantity }}
-                            <a href="{% url 'card-add-update' crt.id %}"><i class="fa fa-plus"></i></a>
-                            
-                        </td>
-                        <td>
-                            {% if crt.product.status != 'None' %}
-                                {% widthratio crt.product_line.sale_price 1 crt.quantity %}
-                            {% else %}
-                                {% widthratio crt.product.sale_price 1 crt.quantity %}
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'cart_delete' crt.id %}"><i class="fa fa-trash" style="color:red"></i></a>
-                        </td>
-                    </tr>
+                    {% for c in cart %}
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>{{ c.product_line.name }}</td>
+                            <td>{{ c.product_line.id }}</td>
+                            <td>
+                                <i class="fa fa-angle-up" onclick="add('{{ c.product_line.id }}')"></i>
+                                <input type="number" id="number{{ c.product_line.id }}" value="{{ c.quantity }}" max="{{ c.product_line.amount }}">
+                                <i class="fa fa-angle-down"></i>
+                            </td>
+                            <td>{{ c.product_line.price }}</td>
+                            <td><a href="{% url 'cart-remove' c.product_line.id %}">remove</a></td>
+                        </tr>
                     {% endfor %}
-                    <tr>
-                        <td colspan="7">total</td>
-                        <td>{{ total }}</td>
-
-
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4">
+                <ul>
+                    <li>price: <span id="price"></span></li>
+                    <li>quantity: <span id="quantity"></span></li>
+                    <li>discount: <span id="discount"></span></li>
+                    <li>Total: <span id="total"></span></li>
+                </ul>
+            </div>
         </div>
-        <div class="row">
-            <form method="post" action="{% url 'order-create' %}">
-                {% csrf_token %}
-                <div class="card" style="padding:10px">
-                    <label for="">email:
-                        <input type="email" name="email" value="{{ user.email }}" required>
-                    </label>
-                    <label for="">first name:
-                        <input type="text" name="first_name" value="{{ user.first_name }}" required>
-                    </label>
-                    <label for="">last_name:
-                        <input type="text" name="last_name" value="{{ user.last_name }}" required>
-                    </label>
-                    <label for="">address:
-                        <input type="text" name="address" value="{{ user.profile.address }}" required>
-                    </label>
-                    
-                </div>
-                <br>
-                <button type="submit" class="btn btn-outline-danger">order</button>
-            </form>
-        </div>
-
-
-
-
     </div>
+    {% comment %} <a href="{% url 'order-detail' order.id %}">order</a> {% endcomment %}
+    <script>
+        function show(){
+            $.ajax({
+                url: "{% url 'show' %}",
+                type : 'GET',
+                success:function(response){
+                    $("#price").html(response.price);
+                    $("#quantity").html(response.quantity);
+                    $("#discount").html(response.discount);
+                    $("#total").html(response.total);
+                }
+            })
+        }
 
+        show();
 
-
-
-
+        function add(id){
+            const num = $("#number" + id).val();
+            const num2 = $("#number" + id).attr('max');
+            quantity = 0;
+            quantity += parseInt(num) + 1;
+            if(quantity <= num2){
+                 $("#number" + id).val(quantity);
+                 $.ajax({
+                     url : "{% url 'add-single' %}",
+                     type:'GET',
+                     data:{product_line_id:id,quantity:quantity},
+                     success:function(data){
+                        show();
+                     }
+                 })
+            }
+        }
+    </script>
 
 
 {% endblock %}

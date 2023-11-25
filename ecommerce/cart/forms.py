@@ -3,7 +3,5 @@ from .models import Cart
 
 
 
-class CartForm(forms.ModelForm):
-    class Meta:
-        model = Cart
-        fields = ['quantity']
+class CartForm(forms.Form):
+    quantity = forms.IntegerField()

@@ -30,8 +30,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_item')
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='order_user')
-    product = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_product')
     product_line = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='order_product_line')
+    price = models.IntegerField(null=True,blank=True)
     quantity = models.IntegerField()
 
 
@@ -48,10 +48,8 @@ class OrderItem(models.Model):
     
 
     def total_price(self):
-        if self.product.status != 'None':
-            return self.product_line.sale_price * self.quantity
-        else:
-            return self.product.sale_price * self.quantity
+        return self.product_line.price * self.quantity
+
 
     
 

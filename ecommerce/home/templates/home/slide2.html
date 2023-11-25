@@ -1,0 +1,54 @@
+<style>
+    html,
+    body {
+      position: relative;
+      height: 100%;
+    }
+
+    body {
+      background: #eee;
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    }
+
+    swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    swiper-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+</style>
+<div class="container-fluid">
+    <swiper-container class="mySwiper" pagination="true" pagination-clickable="true" space-between="30"
+    slides-per-view="3">
+    {% for i in recent_created %}
+        <swiper-slide>
+            <div class="card" style="width: 18rem;">
+                <img src="{{ i.image.url }}" style="height:250px" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">{{ i.name}}</h5>
+                  <a href="{% url 'product_info' i.id %}" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </swiper-slide>
+    {% endfor %}
+  </swiper-container>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>

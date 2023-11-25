@@ -1,9 +1,13 @@
 {% extends "home/base.html" %}
+{% load static %}
 {% block title %} 
 profile
 {% endblock %}
+{% block css %} 
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
 {% block body %} 
-    <div class="container mt-5">
+    {% comment %} <div class="container mt-5">
         <div class="row">
             <div class="col-6">
                 <h1>profile</h1>
@@ -32,8 +36,69 @@ profile
                 <a href={% url 'change_password' %}>change password</a>
             </div>
             <div class="col-6">
-                <img src="{{ profile.photo.url }}" sstyle="width:300px;height:200px;" alt="">
+                <img src="{{ profile.photo.url }}" style="width:300px;height:200px;" alt="">
+            </div>
+        </div> {% endcomment %}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-4">
+                    <div class="side-menu">
+                        <div class="image-container">
+                            <img src="{{ profile.photo.url }}" alt="">
+                        </div>
+                        <a href={% url 'user_profile' %}>profile</a>
+                        <a href={% url 'user_update' %}>update</a>
+                        <a href={% url 'change_password' %}>change password</a>
+                        <a href={% url 'history' %}>history</a>
+                        <a href={% url 'favorite-products' %}>favorite products</a>
+
+                    </div>
+                </div>
+                <div class="col-8">
+                    <div class="profile">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">user: {{ profile.user.username }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">first name: {{ profile.user.first_name }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">last name: {{ profile.user.last_name }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">email: {{ profile.user.email }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">phone: {{ profile.phone }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">address: {{ profile.address }}</h6>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
 {% endblock %}
+
+        {% comment %} <div class="container-fluid">
+            <div class="row">
+                <div class="col-4">
+                    <div class="side-menu">
+                        <div class="image-container">
+                            <img src="{{ profile.photo.url }}" alt="">
+                        </div>
+                        <a href={% url 'user_profile' %}>profile</a>
+                        <a href={% url 'user_update' %}>update</a>
+                        <a href={% url 'change_password' %}>change password</a>
+                        <a href={% url 'history' %}>history</a>
+                        <a href={% url 'favorite-products' %}>favorite products</a>
+
+                    </div>
+                </div>
+                <div class="col-8">
+                    <div class="profile">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">user: {{ profile.user.username }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">first name: {{ profile.user.first_name }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">last name: {{ profile.user.last_name }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">email: {{ profile.user.email }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">phone: {{ profile.phone }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">address: {{ profile.address }}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> {% endcomment %}
+
+
+

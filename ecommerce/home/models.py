@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 from django.db.models.signals import post_save
+from django.utils import timezone
+
 
 class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,blank=True,related_name='sub')
@@ -36,6 +38,7 @@ class Product(models.Model):
         ('None','none'),
         ('size','size'),
         ('color','color'),
+        ('both','both'),
     )
 
     name = models.CharField(max_length=255)
@@ -97,9 +100,22 @@ class Product(models.Model):
         return self.dislike.count()
     
 
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.old_price = self.price
+
+    
+    def save(self,*args,**kwargs):
+        if self.old_price != self.price:
+            self.modified_time = timezone.now()
+        super().save(*args,**kwargs)
+
+
     def get_absolute_url(self):
         return reverse('product_info', args=[self.id])
     
+
+
 
 class Size(models.Model):
     name = models.CharField(max_length=100)
@@ -184,17 +200,20 @@ class Chart(models.Model):
     product_line = models.ForeignKey(ProductLine,on_delete=models.CASCADE,null=True,blank=True,related_name='product_line_update')
 
 
-
     def __str__(self):
         return self.name
     
 
+    def save(self,*args,**kwargs):
+        old_data = Chart.objects.filter(product__exact=self.product,price__exact=self.price)
+        if not old_data.exists():
+            return super(Chart,self).save(*args,**kwargs)
 
 
 def product_post_save(sender,instance,created,*args,**kwargs):
     data = instance
-    if data.chart_change == True:
-        Chart.objects.create(product=data,price=data.price,modified_time=data.modified_time,name=data.name)
+    #if data.chart_change == True:
+    Chart.objects.create(product=data,price=data.price,modified_time=data.modified_time,name=data.name)
 
 
 post_save.connect(product_post_save,sender=Product)
@@ -223,9 +242,18 @@ class Compare(models.Model):
 
 class View(models.Model):
     ip = models.CharField(max_length=200, null=True, blank=True)
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True,related_name='product_view')
     created_time = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
         return self.product.name
+    
+
+
+class Gallary(models.Model):
+    name = models.CharField(max_length=100,null=True,blank=True)
+    image = models.ImageField(upload_to='gallary/', blank=True)
+
+    def __str__(self):
+        return self.name

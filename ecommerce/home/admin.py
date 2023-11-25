@@ -27,6 +27,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug':('name',)}
     raw_id_fields = ('category',)
     inlines = [ProductLineInline, ProductImageInline]
+    change_list_template = 'home/change.html'
 
 
 class CommentAdmin(admin.ModelAdmin):
@@ -41,7 +42,7 @@ class CompareAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Product)
+admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductLine)
 admin.site.register(Size)
 admin.site.register(Color)

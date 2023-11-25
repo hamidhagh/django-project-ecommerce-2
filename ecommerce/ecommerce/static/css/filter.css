@@ -22,3 +22,7 @@
     height: 26px; width: auto; border: 1px solid #ddd; 
     font-size: 13px; line-height: 26px;
 }
+
+ul li {
+    list-style: none;
+}

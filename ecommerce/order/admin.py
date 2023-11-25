@@ -4,7 +4,7 @@ from .models import *
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    readonly_fields = ['user', 'product', 'product_line', 'size', 'color', 'quantity', 'total_price']
+    readonly_fields = ['user', 'product_line', 'size', 'color', 'quantity', 'total_price']
 
 
 class OrderAdmin(admin.ModelAdmin):

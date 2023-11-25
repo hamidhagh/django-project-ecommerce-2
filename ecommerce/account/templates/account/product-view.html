@@ -5,8 +5,8 @@ recent views
 
 {% block body %}
     <div class="container">
-        {% for product in products %}
-            <p>{{ product.name }}</p>
+        {% for view in views %}
+            <p>{{ view.product.name }}</p>
         {% endfor %}
     </div>
 {% endblock %}

@@ -1,3 +1,5 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <div class="collapse navbar-collapse" id="navbarNav">
@@ -7,6 +9,29 @@
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{% url 'all_products' %}">products</a>
+          </li>
+          <li class="nav-item">category
+            <ul class="nav-item">
+              {% for cat in category %}
+                <li class="nav-item">
+                  <a class="nav-link active" href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
+                  <ul class="nav-item">
+                    {% for data in cat.sub.all %}
+                      <li class="nav-item">
+                        <a class="nav-link active" href="{{ data.get_absolute_url }}">{{ data.name }}</a>
+                        <ul class="nav-item">
+                          {% for i in data.sub.all %}
+                            <li class="nav-item">
+                              <a class="nav-link active" href="{{ i.get_absolute_url }}">{{ i.name }}</a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+              {% endfor %}
+            </ul>
           </li>
           {% if user.is_authenticated %}
           <li class="nav-item">
@@ -24,9 +49,55 @@
           </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'cart' %}">cart</a>
+            <a class="nav-link" href="{% url 'cart' %}">cart{{ nums }}</a>
           </li>
         </ul>
+        <form class="form-inline float-sm-right" action="{% url 'all_products' %}">
+          <input class="form-control" type="search" placeholder="search" name="search">
+          <input type="submit" value="search" class="btn btn-primary">
+        </form>
       </div>
     </div>
   </nav>
+
+
+{% comment %} <div class="nav">
+  <div class="container">
+    <ul>
+      <li>
+        <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><i class="fa fa-home"></i></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="{% url 'all_products' %}">products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'cart' %}">cart</a>
+      </li>
+      <li>category
+        <ul>
+          {% for cat in category %}
+            <li>
+              <a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
+              <ul>
+                {% for data in cat.sub.all %}
+                  <li>
+                    <a href="{{ data.get_absolute_url }}">{{ data.name }}</a>
+                    <ul>
+                      {% for i in data.sub.all %}
+                        <li>
+                          <a href="{{ i.get_absolute_url }}">{{ i.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+
+      
+    </ul>
+  </div>
+</div> {% endcomment %}

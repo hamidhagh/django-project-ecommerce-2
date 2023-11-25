@@ -1,11 +1,14 @@
 {% extends "home/base.html" %}
 {% load static %}
+{% load test %}
+{% load humanize %}
 {% load thumbnail %}
 {% block title %} 
 products
 {% endblock %}
 {% block css %} 
     <link rel="stylesheet" href="{% static 'css/filter.css' %}">
+    <link rel="stylesheet" href="{% static 'css/products.css' %}">
 {% endblock %}
 {% block body %} 
     <h1>all products</h1>
@@ -61,6 +64,9 @@ products
                         {{ filter.form.price }}
                         {{ filter.form.created_time }}
                         {{ filter.form.favorite }}
+                        {% if 'search' in request.GET %}
+                            {{ s_form }}
+                        {% endif %}
                     </div>
 
                     <button type="submit" class="btn btn-primary">filter</button>
@@ -81,22 +87,25 @@ products
                             {{ filter.form.color }}
                             {{ filter.form.price_start }}
                             {{ filter.form.price_end }}
+                            {% if 'search' in request.GET %}
+                                {{ s_form }}
+                            {% endif %}
                         </div>
 
                     </form>
                 </div>
 
 
-                <div class="row">
+                {% comment %} <div class="row">
                     {% for product in products %}
                         <div class="col-4">
                             <a href="{{ product.get_absolute_url }}">
                             <h1>{{ product.name }}</h1>
                             </a>
                             <a href="{{ product.get_absolute_url }}">
-                                {% comment %} {% thumbnail product.image '200x200' as img %}
+                                {% thumbnail product.image '200x200' as img %}
                                     <img src="{{ img.url }}" style="width:300px; height:300px" alt="">
-                                {% endthumbnail %} {% endcomment %}
+                                {% endthumbnail %}
                                 <img src="{{ product.image.url }}" style="width:300px; height:300px" alt="">
                             </a>
                             {% if product.discount %}
@@ -111,25 +120,68 @@ products
                             </form>
                         </div>
                     {% endfor %}
+                </div> {% endcomment %}
+                <div class="container">
+                    <h3 class="h3">shopping Demo-1 </h3>
+                    <div class="row">
+                        {% for product in products %}
+                            <div class="col-md-3 col-sm-6">
+                                <div class="product-grid">
+                                    <div class="product-image">
+                                        <a href="{{ product.get_absolute_url }}">
+                                            <img class="pic-1" src="{{ product.image.url }}" style="width:250px; height:300px">
+                                            <img class="pic-2" src="https://www.w3schools.com/bootstrap4/img_avatar3.png">
+                                        </a>
+                                        <ul class="social">
+                                            <li><a href="" data-tip="Quick View"><i class="fa fa-search"></i></a></li>
+                                            <li><a href="" data-tip="Add to Wishlist"><i class="fa fa-shopping-bag"></i></a></li>
+                                            <li><a href="" data-tip="Add to Cart"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                        {% comment %} <span class="product-new-label">Sale</span> {% endcomment %}
+                                        {% if product.discount %}
+                                            <span class="product-discount-label">{{ product.discount }}%</span>
+                                        {% endif %}
+                                    </div>
+                                    <ul class="rating">
+                                        <li class="fa fa-star"></li>
+                                        <li class="fa fa-star"></li>
+                                        <li class="fa fa-star"></li>
+                                        <li class="fa fa-star"></li>
+                                        <li class="fa fa-star disable"></li>
+                                    </ul>
+                                    <div class="product-content">
+                                        <h3 class="title"><a href="#">Women's Blouse</a></h3>
+                                        <div class="price">{{ product.price }}
+                                            <span>$20.00</span>
+                                        </div>
+                                        <a class="add-to-cart" href="">+ Add To Cart</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                    
+                            </div>
+                        {% endfor%}
+                    </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
 
 
 
         <nav aria-label="Page navigation example">
             <ul class="pagination">
                 {% if products.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}&{{ filters }}">Previous</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}&{{ filters }}">{{ products.previous_page_number }}</a></li>
+                    <li class="page-item"><a class="page-link" href="{% filter_url products.previous_page_number 'page' request.GET.urlencode %}">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="{% filter_url products.previous_page_number 'page' request.GET.urlencode %}">{{ products.previous_page_number }}</a></li>
                 {% endif %}
 
-                <li class="page-item {% if page_num == page_num %} active {% endif %}"><a class="page-link" href="?page={{ products.number }}&{{ filters }}">{{ products.number }}</a></li>
+                <li class="page-item {% if page_num == page_num %} active {% endif %}"><a class="page-link" href="{% filter_url products.number 'page' request.GET.urlencode %}">{{ products.number }}</a></li>
 
                 {% if products.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}&{{ filters }}">{{ products.next_page_number }}</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}&{{ filters }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="{% filter_url products.next_page_number 'page' request.GET.urlencode %}">{{ products.next_page_number }}</a></li>
+                    <li class="page-item"><a class="page-link" href="{% filter_url products.next_page_number 'page' request.GET.urlencode %}">Next</a></li>
                 {% endif %}
                 
             </ul>
