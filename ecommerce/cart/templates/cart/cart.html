@@ -23,8 +23,8 @@
                             <td>{{ c.product_line.id }}</td>
                             <td>
                                 <i class="fa fa-angle-up" onclick="add('{{ c.product_line.id }}')"></i>
-                                <input type="number" id="number{{ c.product_line.id }}" value="{{ c.quantity }}" max="{{ c.product_line.amount }}">
-                                <i class="fa fa-angle-down"></i>
+                                <input type="number" min="1" id="number{{ c.product_line.id }}" value="{{ c.quantity }}" max="{{ c.product_line.amount }}">
+                                <i class="fa fa-angle-down" onclick="remove('{{ c.product_line.id }}')"></i>
                             </td>
                             <td>{{ c.product_line.price }}</td>
                             <td><a href="{% url 'cart-remove' c.product_line.id %}">remove</a></td>
@@ -69,6 +69,24 @@
                  $("#number" + id).val(quantity);
                  $.ajax({
                      url : "{% url 'add-single' %}",
+                     type:'GET',
+                     data:{product_line_id:id,quantity:quantity},
+                     success:function(data){
+                        show();
+                     }
+                 })
+            }
+        }
+
+        function remove(id){
+            const num = $("#number" + id).val();
+            const num2 = $("#number" + id).attr('min');
+            quantity = 0;
+            quantity += parseInt(num) - 1;
+            if(quantity >= num2){
+                 $("#number" + id).val(quantity);
+                 $.ajax({
+                     url : "{% url 'remove-single' %}",
                      type:'GET',
                      data:{product_line_id:id,quantity:quantity},
                      success:function(data){

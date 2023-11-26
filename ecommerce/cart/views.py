@@ -50,3 +50,13 @@ def add_single(request):
     cart.save()
     data = {'success': 'ok'}
     return JsonResponse(data)
+
+
+def remove_single(request):
+    product_line_id = request.GET.get('product_line_id')
+    product_line = get_object_or_404(ProductLine, id=product_line_id)
+    cart = Cart(request)
+    cart.add(product_line=product_line, quantity=-1)
+    cart.save()
+    data = {'success': 'ok'}
+    return JsonResponse(data)

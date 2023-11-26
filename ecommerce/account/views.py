@@ -55,6 +55,8 @@ def user_register(request):
             return redirect('home')
     else:
         form = UserRegisterForm()
+    # if request.user.is_authenticated:
+    #     return redirect('home')
     context = {'form':form}
     return render(request, 'account/register.html', context)
 
@@ -82,6 +84,8 @@ def user_login(request):
             
     else:
         form = UserLoginForm()
+    # if request.user.is_authenticated:
+    #     return redirect('home')
     context = {'form':form}
     return render(request, 'account/login.html', context)
 
